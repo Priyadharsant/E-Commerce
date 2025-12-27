@@ -10,9 +10,13 @@ app.use(cors())
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-
-mongoose
-    .connect("mongodb://127.0.0.1:27017/E-Commerce")
+mongoose.connect(
+    "mongodb+srv://Priyan:Priyan123@priyan.s1hquvz.mongodb.net/E-Commerce?appName=Priyan",
+    {
+        useNewUrlParser: true,
+        useUnifiedTopology: true
+    }
+)
     .then(() => console.log("MongoDB connected"))
     .catch(err => console.error(err));
 
