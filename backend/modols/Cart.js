@@ -5,5 +5,4 @@ const CartSchema = new mongoose.Schema({
     quantity: Number
 });
 
-// 👇 force exact collection name
 export default mongoose.model("Cart", CartSchema, "Cart");
