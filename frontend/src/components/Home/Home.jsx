@@ -18,7 +18,7 @@ function Home() {
     const [products, setProducts] = useState([]);
     const [success, SetSuccess] = useState(false);
     useEffect(() => {
-        fetch(" http://172.20.239.55:5000/get")
+        fetch("https://e-commerce-voig.onrender.com/get")
             .then(res => res.json())
             .then(data => {
                 data = shuf(data)
