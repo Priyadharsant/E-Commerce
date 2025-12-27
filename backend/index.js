@@ -4,14 +4,14 @@ import mongoose from "mongoose";
 import Products from "./modols/Products.js";
 import Cart from "./modols/Cart.js";
 import cors from "cors";
-
+import process from "process";
 const app = express();
 app.use(cors())
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 mongoose.connect(
-    "mongodb+srv://Priyan:Priyan123@priyan.s1hquvz.mongodb.net/E-Commerce?appName=Priyan",
+    process.env.MONGODB_URI || "mongodb://localhost:27017/E-Commerce",
     {
         useNewUrlParser: true,
         useUnifiedTopology: true
