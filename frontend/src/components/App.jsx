@@ -1,9 +1,6 @@
-import React from "react";
-import reactDom from "react-dom";
-import Header from "./Header";
+import React from 'react';
 import Home from "./Home/Home";
 import Cart from "./Cart/Cart";
-import Pop from "./Popup";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 function App() {
