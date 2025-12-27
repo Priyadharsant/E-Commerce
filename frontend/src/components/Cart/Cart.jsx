@@ -1,0 +1,98 @@
+import React, { useState, useEffect } from "react";
+import Header from "../Header";
+import CartCard from "./CartCard";
+import Pop from "../Popup";
+
+function Cart() {
+
+    const [Carts, SetCarts] = useState([]);
+    const [success, SetSuccess] = useState(false);
+
+    const [Amount_detail, SetAmountDetails] = useState({
+        Items: 0,
+        Price: 0,
+        TotalPrice: 0
+    });
+
+    // 🔹 Load cart from localStorage
+    function Update() {
+        const data = JSON.parse(localStorage.getItem("cart")) || [];
+        SetCarts(data);
+
+        const Price = data.reduce(
+            (sum, product) => sum + Number(product.price) * product.quantity,
+            0
+        );
+
+        SetAmountDetails({
+            Items: data.length,
+            Price: Price,
+            TotalPrice: Math.round(Price * 0.8 * 100) / 100
+        });
+    }
+
+    useEffect(() => {
+        Update();
+    }, []);
+
+    function Popfunc() {
+        SetSuccess(true);
+        setTimeout(() => SetSuccess(false), 3000);
+    }
+
+    return (
+        <>
+            <Header />
+
+            <div className="CartsCon">
+                <div className="CartsDetailCon">
+                    {Carts.map(cart => (
+                        <CartCard
+                            key={cart.id}
+                            {...cart}
+                            UpdateQuantity={Update}
+                            PopUp={Popfunc}
+                        />
+                    ))}
+                </div>
+
+                <div className="CartsAmountCon">
+                    <h2>Price Details</h2>
+
+                    <div className="NItemsCon">
+                        <p>No of Items</p>
+                        <p>{Amount_detail.Items}</p>
+                    </div>
+
+                    <div className="TotalPriceCon">
+                        <p>Price</p>
+                        <p>₹{Amount_detail.Price}</p>
+                    </div>
+
+                    <div className="DiscountsCon">
+                        <p>Discounts</p>
+                        <p>20%</p>
+                    </div>
+
+                    <div className="FinalAmountCon">
+                        <p>Total Amount</p>
+                        <p>₹{Amount_detail.TotalPrice}</p>
+                    </div>
+                </div>
+            </div>
+
+            <div className="BuyCon">
+                <div>
+                    <span className="material-symbols-outlined">
+                        shopping_bag
+                    </span>
+                    <button className="BuyBtn">Buy</button>
+                </div>
+            </div>
+
+            <Pop success={success} />
+        </>
+    );
+}
+
+export default Cart;
