@@ -15,5 +15,13 @@
 <body>
   <div id="root"></div>
 </body>
-
+<script>
+  const Inter = new IntersectionObserver((entries)=>{
+    entries.forEach((entry)=>{
+      if(entry.isIntersecting){
+        console.log(entry)
+      }
+    })
+  })
+</script>
 </html>

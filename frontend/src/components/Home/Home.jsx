@@ -36,8 +36,9 @@ function Home() {
         <>
             <Header />
             <main>
-                {products.map(product => (
+                {products.map((product, i) => (
                     <ProductCard
+                        index={i}
                         id={product.id}
                         title={product.title}
                         description={product.description}
