@@ -1,0 +1,60 @@
+# ======================
+# Node modules
+# ======================
+node_modules/
+**/node_modules/
+
+# ======================
+# Environment files
+# ======================
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# ======================
+# Logs
+# ======================
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# ======================
+# Build outputs
+# ======================
+dist/
+build/
+frontend/build/
+backend/dist/
+
+# ======================
+# React / Vite cache
+# ======================
+.vite/
+.cache/
+
+# ======================
+# OS files
+# ======================
+.DS_Store
+Thumbs.db
+
+# ======================
+# Editor files
+# ======================
+.vscode/
+.idea/
+*.swp
+
+# ======================
+# Coverage
+# ======================
+coverage/
+
+# ======================
+# Lock files (optional)
+# ======================
+# package-lock.json
+# yarn.lock
