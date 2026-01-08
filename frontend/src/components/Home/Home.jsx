@@ -19,7 +19,7 @@ function Home() {
     const [success, SetSuccess] = useState(false);
 
     useEffect(() => {
-        fetch("http://localhost:5000/get")
+        fetch("/get")
             .then(res => res.json())
             .then(data => {
                 data = shuf(data)
@@ -48,7 +48,7 @@ function Home() {
                             title={product.title}
                             description={product.description}
                             rating={product.rating}
-                            price={product.price} 
+                            price={product.price}
                             off={product.off}
                             category={product.category}
                             PopUp={Popfunc}

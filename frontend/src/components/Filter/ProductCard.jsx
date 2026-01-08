@@ -6,7 +6,7 @@ function ProductCard({ id, title, description, rating, price, off, category, Pop
     function handleClick() {
         console.log(id);
 
-        fetch("http://localhost:5000/add_cart", {
+        fetch("/add_cart", {
             method: "POST",
             credentials: "include", // ⭐ MUST
             headers: { "Content-Type": "application/json" },

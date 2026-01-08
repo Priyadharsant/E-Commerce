@@ -7,7 +7,6 @@ import session from "express-session";
 import passport from "passport";
 import { Strategy } from "passport-local";
 import dotenv from "dotenv";
-
 import Products from "./models/Products.js";
 import Cart from "./models/Cart.js";
 import User from "./models/User.js";
@@ -15,10 +14,9 @@ import User from "./models/User.js";
 dotenv.config();
 
 const app = express();
-
 app.use(cors({
-    origin: "http://localhost:3000",
-    credentials: true
+  origin: "http://localhost:3000",
+  credentials: true
 }));
 
 app.use(bodyParser.urlencoded({ extended: true }));

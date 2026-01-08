@@ -1,6 +1,6 @@
 export async function isLoggedIn() {
     try {
-        const res = await fetch("http://localhost:5000/auth/check", {
+        const res = await fetch("/auth/check", {
             credentials: "include"
         });
 

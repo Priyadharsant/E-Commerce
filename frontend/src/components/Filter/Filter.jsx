@@ -16,7 +16,7 @@ function Filter() {
     useEffect(() => {
         if (!filter) return;
 
-        fetch(`http://localhost:5000/filter?category=${encodeURIComponent(filter)}`)
+        fetch(`/filter?category=${encodeURIComponent(filter)}`)
             .then(res => res.json())
             .then(data => {
                 let result = {};

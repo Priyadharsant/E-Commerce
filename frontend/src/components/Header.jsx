@@ -17,13 +17,13 @@ function Header() {
         setMenuOpen(false);
     }
     useEffect(() => {
-        fetch("http://localhost:5000/categories")
+        fetch("/categories")
             .then(res => res.json())
             .then(data => setCategories(data))
             .catch(err => console.error(err));
     }, []);
     useEffect(() => {
-        fetch("http://localhost:5000/isAuth", {
+        fetch( "/isAuth", {
             credentials: "include",
         })
             .then(res => res.json())
@@ -96,7 +96,7 @@ function Header() {
     }, []);
 
     const handleLogout = async () => {
-        await fetch("http://localhost:5000/logout", {
+        await fetch(process.env.REACT_APP_BACKEND + "/logout", {
             method: "POST",
             credentials: "include",
         });
