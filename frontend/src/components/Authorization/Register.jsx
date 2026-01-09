@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { apiUrl, ENDPOINTS } from "../../config/api";
 
 function Register() {
     const [username, setUsername] = useState("");
@@ -18,7 +19,7 @@ function Register() {
         }
 
         try {
-            const res = await fetch("/signup", {
+            const res = await fetch(apiUrl(ENDPOINTS.SIGNUP), {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ username, password }),

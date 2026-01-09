@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { apiUrl, ENDPOINTS } from "../../config/api";
 import Header from "../Header.jsx";
 import Pop from "../Popup";
 import ProductCard from "./ProductCard";
@@ -19,7 +20,7 @@ function Home() {
     const [success, SetSuccess] = useState(false);
 
     useEffect(() => {
-        fetch("/get")
+        fetch(apiUrl(ENDPOINTS.GET_PRODUCTS))
             .then(res => res.json())
             .then(data => {
                 data = shuf(data)

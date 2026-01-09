@@ -1,10 +1,11 @@
 import React from "react";
+import { apiUrl, ENDPOINTS } from "../../config/api";
 function ProductCard({ id, title, description, rating, price, off, category, PopUp }) {
     let Img = `/img/${id}.png`
     function handleClick() {
         console.log(id);
 
-        fetch("/add_cart", {
+        fetch(apiUrl(ENDPOINTS.ADD_CART), {
             method: "POST",
             credentials: "include", // ⭐ MUST
             headers: { "Content-Type": "application/json" },

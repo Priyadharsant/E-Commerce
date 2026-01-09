@@ -1,6 +1,8 @@
+import { apiUrl, ENDPOINTS } from "../../config/api";
+
 export async function isLoggedIn() {
     try {
-        const res = await fetch("/auth/check", {
+        const res = await fetch(apiUrl(ENDPOINTS.IS_AUTH), {
             credentials: "include"
         });
 

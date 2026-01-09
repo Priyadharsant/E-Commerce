@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { apiUrl, ENDPOINTS } from "../../config/api";
 
 function Login() {
     const [username, setUsername] = useState("");
@@ -12,7 +13,7 @@ function Login() {
         setMsg("");
 
         try {
-            const res = await fetch("/login", {
+            const res = await fetch(apiUrl(ENDPOINTS.LOGIN), {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 credentials: "include",

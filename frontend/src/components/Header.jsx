@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
+import { apiUrl, ENDPOINTS } from "../config/api";
 
 function Header() {
     const navigate = useNavigate();
@@ -17,13 +18,13 @@ function Header() {
         setMenuOpen(false);
     }
     useEffect(() => {
-        fetch("/categories")
+        fetch(apiUrl(ENDPOINTS.CATEGORIES))
             .then(res => res.json())
             .then(data => setCategories(data))
             .catch(err => console.error(err));
     }, []);
     useEffect(() => {
-        fetch( "/isAuth", {
+        fetch(apiUrl(ENDPOINTS.IS_AUTH), {
             credentials: "include",
         })
             .then(res => res.json())
@@ -96,7 +97,7 @@ function Header() {
     }, []);
 
     const handleLogout = async () => {
-        await fetch(process.env.REACT_APP_BACKEND + "/logout", {
+        await fetch(apiUrl(ENDPOINTS.LOGOUT), {
             method: "POST",
             credentials: "include",
         });

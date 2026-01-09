@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { apiUrl, ENDPOINTS } from "../../config/api";
 import Header from "../Header";
 import { useSearchParams } from "react-router-dom";
 import ProductCard from "./ProductCard";
@@ -15,7 +16,7 @@ function Filter() {
     useEffect(() => {
         if (!filter) return;
 
-        fetch(`/filter?category=${encodeURIComponent(filter)}`)
+        fetch(apiUrl(`${ENDPOINTS.FILTER}?category=${encodeURIComponent(filter)}`))
             .then(res => res.json())
             .then(data => {
                 let result = {};

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
+import { apiUrl, ENDPOINTS } from "../../config/api";
 import Header from "../Header";
 import CartCard from "./CartCard";
 import Pop from "../Popup";
@@ -31,7 +32,7 @@ function Cart() {
     }, []);
 
     const Update = useCallback(() => {
-        fetch("/get_cart", {
+        fetch(apiUrl(ENDPOINTS.GET_CART), {
             credentials: "include"
         })
             .then(async res => {

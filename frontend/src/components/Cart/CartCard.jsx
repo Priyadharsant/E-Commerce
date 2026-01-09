@@ -1,4 +1,5 @@
 import React from "react";
+import { apiUrl, ENDPOINTS } from "../../config/api";
 
 
 function getLocalCart() {
@@ -49,7 +50,7 @@ function CartCard({
 
   function AddItems() {
 
-    fetch("/add_cart", {
+    fetch(apiUrl(ENDPOINTS.ADD_CART), {
       method: "POST",
       credentials: "include",
       headers: { "Content-Type": "application/json" },
@@ -73,7 +74,7 @@ function CartCard({
 
   /* ---------- DELETE ITEM ---------- */
   function DeleteItems() {
-    fetch("/delete_cart", {
+    fetch(apiUrl(ENDPOINTS.DELETE_CART), {
       method: "POST",
       credentials: "include",
       headers: { "Content-Type": "application/json" },
