@@ -1,10 +1,10 @@
 {
   "files": {
-    "main.js": "/Priyadharsant/E-Commerce/static/js/main.516873ed.js",
+    "main.js": "/Priyadharsant/E-Commerce/static/js/main.01c19c3d.js",
     "index.html": "/Priyadharsant/E-Commerce/index.html",
-    "main.516873ed.js.map": "/Priyadharsant/E-Commerce/static/js/main.516873ed.js.map"
+    "main.01c19c3d.js.map": "/Priyadharsant/E-Commerce/static/js/main.01c19c3d.js.map"
   },
   "entrypoints": [
-    "static/js/main.516873ed.js"
+    "static/js/main.01c19c3d.js"
   ]
 }
