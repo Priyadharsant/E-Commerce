@@ -27,9 +27,23 @@ app.use(cors({
     origin: function (origin, callback) {
         // allow requests with no origin (like mobile apps, curl, server-to-server)
         if (!origin) return callback(null, true);
+        // allow explicit allowed origins
         if (allowedOrigins.indexOf(origin) !== -1) {
             return callback(null, true);
         }
+
+        // allow Netlify preview or site domains and GitHub Pages domains
+        try {
+            const url = new URL(origin);
+            const host = url.hostname;
+            if (host.endsWith(".netlify.app") || host.endsWith(".github.io")) {
+                return callback(null, true);
+            }
+        } catch (e) {
+            // ignore malformed origin
+        }
+
+        console.warn(`CORS blocked origin: ${origin}`);
         return callback(new Error("CORS policy: This origin is not allowed."));
     },
     credentials: true
