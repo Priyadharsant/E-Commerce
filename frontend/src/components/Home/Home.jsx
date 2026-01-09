@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { ENDPOINTS } from "../../config/api";
 import { fetchJson } from "../../utils/api";
 import { userMessageFromError, logError } from "../../utils/errorHandler";
+import LoadingSpinner from "../LoadingSpinner";
 import Header from "../Header.jsx";
 import Pop from "../Popup";
 import ProductCard from "./ProductCard";
@@ -55,7 +56,11 @@ function Home() {
             <Header />
             <main>
                 <div className="Container">
-                    {loading && <p className="muted">Loading products...</p>}
+                    {loading && (
+                        <div style={{ width: "100%", textAlign: "center", padding: "1rem" }}>
+                            <LoadingSpinner />
+                        </div>
+                    )}
                     {error && <p className="error">{error}</p>}
                     {!loading && !error && products.map(product => (
                         <ProductCard

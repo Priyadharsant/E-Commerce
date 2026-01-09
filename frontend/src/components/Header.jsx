@@ -4,6 +4,7 @@ import { ENDPOINTS } from "../config/api";
 import { fetchJson } from "../utils/api";
 import { userMessageFromError, logError } from "../utils/errorHandler";
 import useInView from "../hooks/useInView";
+import LoadingSpinner from "./LoadingSpinner";
 
 function Header() {
     const navigate = useNavigate();
@@ -240,7 +241,7 @@ function Header() {
                     </div>
                     <div className="categoriesCon">
                         <button onClick={() => Filter("all")}>All</button>
-                        {categoriesLoading && <p className="muted">Loading categories...</p>}
+                        {categoriesLoading && <LoadingSpinner size="sm" />}
                         {categoriesError && <p className="error">{categoriesError}</p>}
                         {!categoriesLoading && !categoriesError && Categories.map((category) => (
                             <button

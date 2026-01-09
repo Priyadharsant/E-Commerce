@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { ENDPOINTS } from "../../config/api";
 import { fetchJson } from "../../utils/api";
 import { userMessageFromError, logError } from "../../utils/errorHandler";
+import LoadingSpinner from "../LoadingSpinner";
 import Header from "../Header";
 import { useSearchParams } from "react-router-dom";
 import FilterSection from "./FilterSection";
@@ -70,7 +71,11 @@ function Filter() {
         <>
             <Header />
             <main>
-                {loading && <p className="muted">Loading products...</p>}
+                {loading && (
+                    <div style={{ width: "100%", textAlign: "center", padding: "1rem" }}>
+                        <LoadingSpinner />
+                    </div>
+                )}
                 {error && <p className="error">{error}</p>}
 
                 {!loading && Object.keys(categories).length === 0 && (
