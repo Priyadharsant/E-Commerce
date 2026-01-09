@@ -1,5 +1,7 @@
 import React, { useState } from "react";
-import { apiUrl, ENDPOINTS } from "../../config/api";
+import { ENDPOINTS } from "../../config/api";
+import { fetchJson } from "../../utils/api";
+import { logError, userMessageFromError } from "../../utils/errorHandler";
 
 function Register() {
     const [username, setUsername] = useState("");
@@ -19,23 +21,12 @@ function Register() {
         }
 
         try {
-            const res = await fetch(apiUrl(ENDPOINTS.SIGNUP), {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ username, password }),
-            });
-
-            const data = await res.json();
-
-            if (!res.ok) {
-                setDuplicateUser(true);
-                setErrorMsg(data.msg);
-            } else {
-                window.location.href = "/login";
-            }
-
+            await fetchJson(ENDPOINTS.SIGNUP, { method: "POST", body: JSON.stringify({ username, password }) });
+            window.location.href = "/login";
         } catch (err) {
-            setErrorMsg("Something went wrong");
+            logError(err, { source: "Register:handleSubmit" });
+            setDuplicateUser(true);
+            setErrorMsg(userMessageFromError(err) || "Something went wrong");
         }
     };
 

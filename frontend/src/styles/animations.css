@@ -1,0 +1,35 @@
+/* Smooth scroll-based animations */
+.scroll-animate {
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 600ms cubic-bezier(.22, .9, .28, 1), transform 600ms cubic-bezier(.22, .9, .28, 1);
+    will-change: opacity, transform;
+}
+
+.scroll-animate.in-view {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Slight variation for subtle delay on product cards */
+.scroll-animate.stagger-1.in-view {
+    transition-delay: 60ms;
+}
+
+.scroll-animate.stagger-2.in-view {
+    transition-delay: 120ms;
+}
+
+.scroll-animate.stagger-3.in-view {
+    transition-delay: 180ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .scroll-animate,
+    .scroll-animate.in-view {
+        transition: none !important;
+        transform: none !important;
+        opacity: 1 !important;
+    }
+}

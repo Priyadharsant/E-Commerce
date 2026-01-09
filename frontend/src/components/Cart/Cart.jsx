@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { apiUrl, ENDPOINTS } from "../../config/api";
+import { ENDPOINTS } from "../../config/api";
+import { fetchJson } from "../../utils/api";
+import { logError } from "../../utils/errorHandler";
 import Header from "../Header";
 import CartCard from "./CartCard";
 import Pop from "../Popup";
@@ -32,36 +34,24 @@ function Cart() {
     }, []);
 
     const Update = useCallback(() => {
-        fetch(apiUrl(ENDPOINTS.GET_CART), {
-            credentials: "include"
-        })
-            .then(async res => {
-                if (res.status === 401) {
-                    const localCart = getLocalCart();
-                    SetCarts(localCart);
-                    calculateAmounts(localCart);
-                    return;
-                }
-
-                if (!res.ok) throw new Error("Server error");
-
-                const data = await res.json();
-
+        (async function loadCart() {
+            try {
+                const data = await fetchJson(ENDPOINTS.GET_CART);
                 if (!Array.isArray(data)) {
                     SetCarts([]);
                     calculateAmounts([]);
                     return;
                 }
-
                 SetCarts(data);
                 calculateAmounts(data);
-            })
-            .catch(err => {
-                console.error(err);
+            } catch (err) {
+                // fallback to local cart on auth or network errors
+                logError(err, { source: "Cart:Update" });
                 const localCart = getLocalCart();
                 SetCarts(localCart);
                 calculateAmounts(localCart);
-            });
+            }
+        })();
     }, [getLocalCart, calculateAmounts]);
 
     useEffect(() => {

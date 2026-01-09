@@ -1,31 +1,29 @@
 import React from "react";
-import { apiUrl, ENDPOINTS } from "../../config/api";
+import { ENDPOINTS } from "../../config/api";
+import { fetchJson } from "../../utils/api";
+import { logError, userMessageFromError } from "../../utils/errorHandler";
+import useInView from "../../hooks/useInView";
 function ProductCard({ key, id, title, description, rating, price, off, category, PopUp }) {
-    let Img = `/img/${id}.png`
+    let Img = `/img/${id}.png`;
+    const [ref, inView] = useInView({ once: true });
+    const [apiError, setApiError] = React.useState("");
     function handleClick() {
-        fetch(apiUrl(ENDPOINTS.ADD_CART), {
-            method: "POST",
-            credentials: "include",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ id })
-        }).then(async res => {
-            if (res.status === 401) {
-                saveToLocalCart(id);
+        (async function addToCart() {
+            setApiError("");
+            try {
+                await fetchJson(ENDPOINTS.ADD_CART, { method: "POST", body: JSON.stringify({ id }) });
                 PopUp();
-                return;
+            } catch (err) {
+                // 401 -> save to local cart
+                if (err.status === 401) {
+                    saveToLocalCart(id);
+                    PopUp();
+                    return;
+                }
+                logError(err, { source: "Home:ProductCard:add_cart", id });
+                setApiError(userMessageFromError(err));
             }
-
-            if (!res.ok) {
-                throw new Error("Server error");
-            }
-
-            const data = await res.json();
-            console.log("DB Cart:", data);
-            PopUp();
-        })
-            .catch(err => {
-                console.error("Error:", err);
-            });
+        })();
     }
     function saveToLocalCart(id) {
 
@@ -57,7 +55,7 @@ function ProductCard({ key, id, title, description, rating, price, off, category
     }
 
     return (
-        <div key={key} id={id} category={category} className="Card">
+        <div ref={ref} key={key} id={id} category={category} className={`Card scroll-animate ${inView ? "in-view" : ""}`}>
             <div className="CardImg">
                 <img src={Img} alt={title} />
             </div>
@@ -80,6 +78,7 @@ function ProductCard({ key, id, title, description, rating, price, off, category
                 </div>
 
                 <p className="Price">₹{price}</p>
+                {apiError && <p className="error small" style={{ marginTop: 8 }}>{apiError}</p>}
 
             </div>
             <button onClick={handleClick} className="ProductCartBtn">Cart</button>

@@ -10,6 +10,8 @@ import dotenv from "dotenv";
 import Products from "./models/Products.js";
 import Cart from "./models/Cart.js";
 import User from "./models/User.js";
+import asyncHandler from "./utils/asyncHandler.js";
+import { logError } from "./utils/errorLogger.js";
 
 dotenv.config();
 
@@ -129,17 +131,17 @@ passport.deserializeUser(async (id, done) => {
 });
 
 
-app.get("/get", async (req, res) => {
+app.get("/get", asyncHandler(async (req, res) => {
     const products = await Products.find();
     res.json(products);
-});
+}));
 
-app.get("/categories", async (req, res) => {
+app.get("/categories", asyncHandler(async (req, res) => {
     const categories = await Products.distinct("category");
     res.json(categories);
-});
+}));
 
-app.get("/filter", async (req, res) => {
+app.get("/filter", asyncHandler(async (req, res) => {
     const { category } = req.query;
 
     if (!category || category === "all") {
@@ -156,9 +158,9 @@ app.get("/filter", async (req, res) => {
 
     const products = await Products.find({ category });
     res.json({ type: "single", data: { [category]: products } });
-});
+}));
 
-app.post("/add_cart", isAuth, async (req, res) => {
+app.post("/add_cart", isAuth, asyncHandler(async (req, res) => {
     const { id } = req.body;
     const userId = req.user._id;
 
@@ -174,10 +176,10 @@ app.post("/add_cart", isAuth, async (req, res) => {
     }
 
     res.json({ msg: "Added to cart" });
-});
+}));
 
 
-app.post("/delete_cart", isAuth, async (req, res) => {
+app.post("/delete_cart", isAuth, asyncHandler(async (req, res) => {
     const { id } = req.body;
     const userId = req.user._id;
 
@@ -194,9 +196,9 @@ app.post("/delete_cart", isAuth, async (req, res) => {
     }
 
     res.json({ msg: "Cart updated" });
-});
+}));
 
-app.get("/get_cart", isAuth, async (req, res) => {
+app.get("/get_cart", isAuth, asyncHandler(async (req, res) => {
     const cartItems = await Cart.find({ userId: req.user._id });
 
     const ids = cartItems.map(i => i.productId);
@@ -208,10 +210,10 @@ app.get("/get_cart", isAuth, async (req, res) => {
     });
 
     res.json(result);
-});
+}));
 
 
-app.post("/signup", async (req, res) => {
+app.post("/signup", asyncHandler(async (req, res) => {
     const { username, password } = req.body;
 
     const exists = await User.findOne({ username });
@@ -223,17 +225,18 @@ app.post("/signup", async (req, res) => {
     await User.create({ username, password: hash });
 
     res.status(201).json({ msg: "User created" });
-});
+}));
 
 app.post("/login", (req, res, next) => {
     passport.authenticate("local", (err, user, info) => {
+        if (err) return next(err);
         if (!user) {
-            return res.status(401).json({ msg: info.message });
+            return res.status(401).json({ msg: info && info.message ? info.message : "Unauthorized" });
         }
 
         req.logIn(user, err => {
             if (err) return next(err);
-            console.log("Logined")
+            console.log("Logined");
             res.json({
                 msg: "Login success",
                 user: { id: user._id, username: user.username }
@@ -244,6 +247,21 @@ app.post("/login", (req, res, next) => {
 
 app.post("/logout", (req, res) => {
     req.logout(() => res.json({ msg: "Logged out" }));
+});
+
+// 404 handler
+app.use((req, res) => {
+    res.status(404).json({ msg: "Not found" });
+});
+
+// Centralized error handler
+app.use((err, req, res, next) => {
+    // log error in development
+    try { logError(err, req); } catch (e) { /* ignore logging errors */ }
+
+    const status = err && err.status ? err.status : 500;
+    const safeMessage = status >= 500 ? "Internal server error" : (err && err.message ? err.message : "Error");
+    res.status(status).json({ msg: safeMessage });
 });
 
 

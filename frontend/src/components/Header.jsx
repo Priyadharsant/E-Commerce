@@ -1,14 +1,20 @@
 import React, { useEffect, useState, useRef } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { apiUrl, ENDPOINTS } from "../config/api";
+import { ENDPOINTS } from "../config/api";
+import { fetchJson } from "../utils/api";
+import { userMessageFromError, logError } from "../utils/errorHandler";
+import useInView from "../hooks/useInView";
 
 function Header() {
     const navigate = useNavigate();
     const location = useLocation();
+    const [headerRef, headerInView] = useInView({ once: true, threshold: 0.05 });
     const [Categories, setCategories] = useState([]);
     const [open, setOpen] = useState(false)
     const [menuOpen, setMenuOpen] = useState(false);
     const [logined, setLogined] = useState(false);
+    const [categoriesLoading, setCategoriesLoading] = useState(false);
+    const [categoriesError, setCategoriesError] = useState("");
     const navRef = useRef(null);
     const menuBtnRef = useRef(null);
     const filterRef = useRef(null);
@@ -18,20 +24,37 @@ function Header() {
         setMenuOpen(false);
     }
     useEffect(() => {
-        fetch(apiUrl(ENDPOINTS.CATEGORIES))
-            .then(res => res.json())
-            .then(data => setCategories(data))
-            .catch(err => console.error(err));
+        let mounted = true;
+        (async function loadCategories() {
+            setCategoriesLoading(true);
+            setCategoriesError("");
+            try {
+                const data = await fetchJson(ENDPOINTS.CATEGORIES);
+                if (mounted) setCategories(Array.isArray(data) ? data : []);
+            } catch (err) {
+                if (mounted) {
+                    setCategories([]);
+                    setCategoriesError(userMessageFromError(err));
+                }
+            } finally {
+                if (mounted) setCategoriesLoading(false);
+            }
+        })();
+        return () => { mounted = false; };
     }, []);
     useEffect(() => {
-        fetch(apiUrl(ENDPOINTS.IS_AUTH), {
-            credentials: "include",
-        })
-            .then(res => res.json())
-            .then(data => {
-                setLogined(data.authenticated === true);
-            })
-            .catch(() => setLogined(false));
+        let mounted = true;
+        (async function checkAuth() {
+            try {
+                const data = await fetchJson(ENDPOINTS.IS_AUTH);
+                if (mounted) setLogined(data && data.authenticated === true);
+            } catch (err) {
+                // treat failures as not logged in
+                logError(err, { source: "Header:isAuth" });
+                if (mounted) setLogined(false);
+            }
+        })();
+        return () => { mounted = false; };
     }, [location.pathname]);
     useEffect(() => {
         function handleClickOutside(e) {
@@ -97,15 +120,17 @@ function Header() {
     }, []);
 
     const handleLogout = async () => {
-        await fetch(apiUrl(ENDPOINTS.LOGOUT), {
-            method: "POST",
-            credentials: "include",
-        });
-        setLogined(false);
-        navigate("/");
+        try {
+            await fetchJson(ENDPOINTS.LOGOUT, { method: "POST" });
+        } catch (err) {
+            logError(err, { source: "Header:logout" });
+        } finally {
+            setLogined(false);
+            navigate("/");
+        }
     };
     return (
-        <header>
+        <header ref={headerRef} className={`scroll-animate ${headerInView ? "in-view" : ""}`}>
             <div className="header">
                 <div className="header-logo">
                     <span className="material-symbols-outlined">
@@ -215,8 +240,9 @@ function Header() {
                     </div>
                     <div className="categoriesCon">
                         <button onClick={() => Filter("all")}>All</button>
-
-                        {Categories.map((category) => (
+                        {categoriesLoading && <p className="muted">Loading categories...</p>}
+                        {categoriesError && <p className="error">{categoriesError}</p>}
+                        {!categoriesLoading && !categoriesError && Categories.map((category) => (
                             <button
                                 key={category}
                                 onClick={() => Filter(category)}

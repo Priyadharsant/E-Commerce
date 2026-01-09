@@ -1,5 +1,7 @@
 import React, { useState } from "react";
-import { apiUrl, ENDPOINTS } from "../../config/api";
+import { ENDPOINTS } from "../../config/api";
+import { fetchJson } from "../../utils/api";
+import { logError, userMessageFromError } from "../../utils/errorHandler";
 
 function Login() {
     const [username, setUsername] = useState("");
@@ -13,28 +15,12 @@ function Login() {
         setMsg("");
 
         try {
-            const res = await fetch(apiUrl(ENDPOINTS.LOGIN), {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                credentials: "include",
-                body: JSON.stringify({ username, password })
-            });
-
-            let data = {};
-            try {
-                data = await res.json();
-            } catch { }
-
-            if (!res.ok) {
-                setIncorrect(true);
-                setMsg(data.msg || "Invalid credentials");
-            } else {
-                window.location.href = "/";
-            }
-
+            await fetchJson(ENDPOINTS.LOGIN, { method: "POST", body: JSON.stringify({ username, password }) });
+            window.location.href = "/";
         } catch (err) {
+            logError(err, { source: "Login:handleSubmit" });
             setIncorrect(true);
-            setMsg("Something went wrong");
+            setMsg(userMessageFromError(err) || "Invalid credentials");
         }
     };
 

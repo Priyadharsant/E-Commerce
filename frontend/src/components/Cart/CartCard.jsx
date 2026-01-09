@@ -1,5 +1,7 @@
 import React from "react";
-import { apiUrl, ENDPOINTS } from "../../config/api";
+import { ENDPOINTS } from "../../config/api";
+import { fetchJson } from "../../utils/api";
+import { logError, userMessageFromError } from "../../utils/errorHandler";
 
 
 function getLocalCart() {
@@ -21,6 +23,7 @@ function CartCard({
   UpdateQuantity,
   PopUp
 }) {
+  const [apiError, setApiError] = React.useState("");
 
   /* ---------- LOCAL CART LOGIC ---------- */
   function addToLocalCart() {
@@ -48,50 +51,39 @@ function CartCard({
     UpdateQuantity();
   }
 
-  function AddItems() {
-
-    fetch(apiUrl(ENDPOINTS.ADD_CART), {
-      method: "POST",
-      credentials: "include",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id })
-    })
-      .then(res => {
-        if (res.status === 401) {
-          addToLocalCart();
-          UpdateQuantity();
-          PopUp();
-          return;
-        }
-
-        if (!res.ok) throw new Error("Server error");
-
+  async function AddItems() {
+    setApiError("");
+    try {
+      await fetchJson(ENDPOINTS.ADD_CART, { method: "POST", body: JSON.stringify({ id }) });
+      UpdateQuantity();
+      PopUp();
+    } catch (err) {
+      if (err.status === 401) {
+        addToLocalCart();
         UpdateQuantity();
         PopUp();
-      })
-      .catch(err => console.error(err));
+        return;
+      }
+      logError(err, { source: "CartCard:AddItems", id });
+      setApiError(userMessageFromError(err));
+    }
   }
 
   /* ---------- DELETE ITEM ---------- */
-  function DeleteItems() {
-    fetch(apiUrl(ENDPOINTS.DELETE_CART), {
-      method: "POST",
-      credentials: "include",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id })
-    })
-      .then(res => {
-        if (res.status === 401) {
-          deleteFromLocalCart(id);
-          UpdateQuantity();
-          return;
-        }
-
-        if (!res.ok) throw new Error("Server error");
-
+  async function DeleteItems() {
+    setApiError("");
+    try {
+      await fetchJson(ENDPOINTS.DELETE_CART, { method: "POST", body: JSON.stringify({ id }) });
+      UpdateQuantity();
+    } catch (err) {
+      if (err.status === 401) {
+        deleteFromLocalCart(id);
         UpdateQuantity();
-      })
-      .catch(err => console.error(err));
+        return;
+      }
+      logError(err, { source: "CartCard:DeleteItems", id });
+      setApiError(userMessageFromError(err));
+    }
   }
 
   return (
@@ -113,6 +105,7 @@ function CartCard({
         </div>
 
         <p className="Price">₹ {price}</p>
+        {apiError && <p className="error small" style={{ marginTop: 8 }}>{apiError}</p>}
       </div>
 
       <div className="CartQuantity">

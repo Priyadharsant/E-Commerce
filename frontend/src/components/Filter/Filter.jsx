@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { apiUrl, ENDPOINTS } from "../../config/api";
+import { ENDPOINTS } from "../../config/api";
+import { fetchJson } from "../../utils/api";
+import { userMessageFromError, logError } from "../../utils/errorHandler";
 import Header from "../Header";
 import { useSearchParams } from "react-router-dom";
-import ProductCard from "./ProductCard";
+import FilterSection from "./FilterSection";
 
 function Filter() {
     const [searchParams] = useSearchParams();
@@ -12,16 +14,20 @@ function Filter() {
     const rating = searchParams.get("rating");
     const discount = searchParams.get("discount");
     const [categories, setCategories] = useState({});
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState("");
 
     useEffect(() => {
         if (!filter) return;
 
-        fetch(apiUrl(`${ENDPOINTS.FILTER}?category=${encodeURIComponent(filter)}`))
-            .then(res => res.json())
-            .then(data => {
+        (async function load() {
+            setLoading(true);
+            setError("");
+            try {
+                const data = await fetchJson(`${ENDPOINTS.FILTER}?category=${encodeURIComponent(filter)}`);
                 let result = {};
 
-                Object.keys(data.data).forEach(categoryName => {
+                Object.keys(data.data || {}).forEach(categoryName => {
                     let products = [...data.data[categoryName]];
 
                     if (price === "asc") {
@@ -49,8 +55,14 @@ function Filter() {
                 });
 
                 setCategories(result);
-            })
-            .catch(err => console.error(err));
+            } catch (err) {
+                logError(err, { source: "Filter:load" });
+                setCategories({});
+                setError(userMessageFromError(err));
+            } finally {
+                setLoading(false);
+            }
+        })();
 
     }, [filter, price, rating, discount]);
 
@@ -58,24 +70,20 @@ function Filter() {
         <>
             <Header />
             <main>
-                {Object.keys(categories).length === 0 && (
+                {loading && <p className="muted">Loading products...</p>}
+                {error && <p className="error">{error}</p>}
+
+                {!loading && Object.keys(categories).length === 0 && (
                     <p className="noProducts">No products found</p>
                 )}
 
-
                 {Object.keys(categories).map(categoryName => (
-                    <div key={categoryName} className="filterContainer">
-                        <h2>{categoryName}</h2>
-
-                        <div className={`filterProducts ${filter === "all" ? "Multi" : ""}`}>
-                            {categories[categoryName].map(product => (
-                                <ProductCard
-                                    key={product._id}
-                                    {...product}
-                                />
-                            ))}
-                        </div>
-                    </div>
+                    <FilterSection
+                        key={categoryName}
+                        categoryName={categoryName}
+                        products={categories[categoryName]}
+                        filter={filter}
+                    />
                 ))}
             </main>
         </>

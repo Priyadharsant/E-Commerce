@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { apiUrl, ENDPOINTS } from "../../config/api";
+import { ENDPOINTS } from "../../config/api";
+import { fetchJson } from "../../utils/api";
+import { userMessageFromError, logError } from "../../utils/errorHandler";
 import Header from "../Header.jsx";
 import Pop from "../Popup";
 import ProductCard from "./ProductCard";
@@ -18,15 +20,26 @@ function shuf(array) {
 function Home() {
     const [products, setProducts] = useState([]);
     const [success, SetSuccess] = useState(false);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState("");
 
     useEffect(() => {
-        fetch(apiUrl(ENDPOINTS.GET_PRODUCTS))
-            .then(res => res.json())
-            .then(data => {
-                data = shuf(data)
-                setProducts(data);
-            })
-            .catch(err => console.error(err));
+        let mounted = true;
+        (async function load() {
+            setLoading(true);
+            setError("");
+            try {
+                const data = await fetchJson(ENDPOINTS.GET_PRODUCTS);
+                if (!Array.isArray(data)) throw new Error("Invalid products data");
+                if (mounted) setProducts(shuf(data));
+            } catch (err) {
+                logError(err, { source: "Home:get_products" });
+                if (mounted) setError(userMessageFromError(err));
+            } finally {
+                if (mounted) setLoading(false);
+            }
+        })();
+        return () => { mounted = false; };
     }, []);
     function Popfunc() {
         SetSuccess(true)
@@ -42,7 +55,9 @@ function Home() {
             <Header />
             <main>
                 <div className="Container">
-                    {products.map(product => (
+                    {loading && <p className="muted">Loading products...</p>}
+                    {error && <p className="error">{error}</p>}
+                    {!loading && !error && products.map(product => (
                         <ProductCard
                             key={product.id}
                             id={product.id}
