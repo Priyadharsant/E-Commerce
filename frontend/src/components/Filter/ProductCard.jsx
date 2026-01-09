@@ -1,6 +1,4 @@
-import React, { useEffect } from "react";
-let i = 0;
-
+import React from "react";
 function ProductCard({ id, title, description, rating, price, off, category, PopUp }) {
     let Img = `/img/${id}.png`
     function handleClick() {

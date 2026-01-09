@@ -8,9 +8,8 @@ function Filter() {
 
     const price = searchParams.get("price");
     const filter = searchParams.get("filter") || "all";
-    const rating = searchParams.get("rating");  
-    const discount = searchParams.get("discount"); 
-    const [loading, setLoading] = useState(true);
+    const rating = searchParams.get("rating");
+    const discount = searchParams.get("discount");
     const [categories, setCategories] = useState({});
 
     useEffect(() => {
@@ -58,7 +57,7 @@ function Filter() {
         <>
             <Header />
             <main>
-                {!loading && Object.keys(categories).length === 0 && (
+                {Object.keys(categories).length === 0 && (
                     <p className="noProducts">No products found</p>
                 )}
 
