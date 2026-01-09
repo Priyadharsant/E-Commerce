@@ -14,13 +14,33 @@ import User from "./models/User.js";
 dotenv.config();
 
 const app = express();
+const FRONTEND_URL = process.env.FRONTEND_URL || "https://priyadharsant.github.io/E-Commerce";
+const allowedOrigins = [FRONTEND_URL, "http://localhost:3000"];
+
+app.use((req, res, next) => {
+    res.header("Access-Control-Allow-Credentials", "true");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    next();
+});
+
 app.use(cors({
-  origin: "http://localhost:3000",
-  credentials: true
+    origin: function (origin, callback) {
+        // allow requests with no origin (like mobile apps, curl, server-to-server)
+        if (!origin) return callback(null, true);
+        if (allowedOrigins.indexOf(origin) !== -1) {
+            return callback(null, true);
+        }
+        return callback(new Error("CORS policy: This origin is not allowed."));
+    },
+    credentials: true
 }));
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+
+const isProd = process.env.NODE_ENV === "production";
+// trust proxy when behind a proxy (e.g., render, heroku)
+if (isProd) app.set("trust proxy", 1);
 
 app.use(session({
     name: "connect.sid",
@@ -29,8 +49,8 @@ app.use(session({
     saveUninitialized: false,
     cookie: {
         httpOnly: true,
-        sameSite: "lax",   // ✅ DEFAULT & SAFE
-        secure: false,     // localhost
+        sameSite: isProd ? "none" : "lax",
+        secure: isProd, // cookies only sent over HTTPS in production
         maxAge: 1000 * 60 * 60 * 24
     }
 }));
