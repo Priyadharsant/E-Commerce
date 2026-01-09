@@ -64,10 +64,11 @@ function Cart() {
                 calculateAmounts(localCart);
             });
     }
-
     useEffect(() => {
         Update();
-    }, []);
+    }, [Update]);
+    ;
+
 
     function Popfunc() {
         SetSuccess(true);
