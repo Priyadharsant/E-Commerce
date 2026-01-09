@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Header from "../Header";
 import CartCard from "./CartCard";
 import Pop from "../Popup";
@@ -12,13 +12,12 @@ function Cart() {
         TotalPrice: 0
     });
 
-
-    function getLocalCart() {
+    const getLocalCart = useCallback(() => {
         const cart = JSON.parse(localStorage.getItem("cart")) || {};
-        return Object.values(cart); // convert object → array
-    }
+        return Object.values(cart);
+    }, []);
 
-    function calculateAmounts(data) {
+    const calculateAmounts = useCallback((data) => {
         const Price = data.reduce(
             (sum, product) => sum + Number(product.price) * product.quantity,
             0
@@ -29,10 +28,9 @@ function Cart() {
             Price,
             TotalPrice: Math.round(Price * 0.8 * 100) / 100
         });
-    }
+    }, []);
 
-
-    function Update() {
+    const Update = useCallback(() => {
         fetch("/get_cart", {
             credentials: "include"
         })
@@ -63,12 +61,11 @@ function Cart() {
                 SetCarts(localCart);
                 calculateAmounts(localCart);
             });
-    }
+    }, [getLocalCart, calculateAmounts]);
+
     useEffect(() => {
         Update();
     }, [Update]);
-    ;
-
 
     function Popfunc() {
         SetSuccess(true);
@@ -76,6 +73,7 @@ function Cart() {
             SetSuccess(false);
         }, 3000);
     }
+
     return (
         <>
             <Header />
@@ -127,10 +125,10 @@ function Cart() {
                             </div>
                         </div>
                     </>
-                ) : (<p style={{ padding: "1rem", textAlign: "center" }}>
-                    Your cart is empty
-                </p>
-
+                ) : (
+                    <p style={{ padding: "1rem", textAlign: "center" }}>
+                        Your cart is empty
+                    </p>
                 )}
             </div>
 
