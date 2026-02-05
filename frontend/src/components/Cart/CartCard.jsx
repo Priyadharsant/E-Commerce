@@ -13,10 +13,11 @@ function setLocalCart(cart) {
 }
 
 function CartCard({
-  id,
+  slug,
   title,
   description,
   rating,
+  image,
   price,
   off,
   quantity,
@@ -30,7 +31,7 @@ function CartCard({
 
     let cart = getLocalCart() || [];
 
-    const item = cart.find(p => p.id === id);
+    const item = cart.find(p => p.slug === slug);
     if (item) item.quantity += 1;
 
     setLocalCart(cart)
@@ -38,11 +39,11 @@ function CartCard({
 
   function deleteFromLocalCart(productId) {
 
-    let cart = JSON.parse(localStorage.getItem("cart")) || [];
+    let cart = JSON.parse(localStorage.getItem("Cart")) || [];
 
     cart = cart
       .map(item =>
-        item.id === id
+        item.slug === slug
           ? { ...item, quantity: item.quantity - 1 }
           : item
       )
@@ -54,7 +55,7 @@ function CartCard({
   async function AddItems() {
     setApiError("");
     try {
-      await fetchJson(ENDPOINTS.ADD_CART, { method: "POST", body: JSON.stringify({ id }) });
+      await fetchJson(ENDPOINTS.ADD_CART, { method: "POST", body: JSON.stringify({ slug }) });
       UpdateQuantity();
       PopUp();
     } catch (err) {
@@ -64,7 +65,7 @@ function CartCard({
         PopUp();
         return;
       }
-      logError(err, { source: "CartCard:AddItems", id });
+      logError( { source: "CartCard:AddItems", slug });
       setApiError(userMessageFromError(err));
     }
   }
@@ -73,23 +74,23 @@ function CartCard({
   async function DeleteItems() {
     setApiError("");
     try {
-      await fetchJson(ENDPOINTS.DELETE_CART, { method: "POST", body: JSON.stringify({ id }) });
+      await fetchJson(ENDPOINTS.DELETE_CART, { method: "POST", body: JSON.stringify({ slug }) });
       UpdateQuantity();
     } catch (err) {
       if (err.status === 401) {
-        deleteFromLocalCart(id);
+        deleteFromLocalCart(slug);
         UpdateQuantity();
         return;
       }
-      logError(err, { source: "CartCard:DeleteItems", id });
+      logError(err, { source: "CartCard:DeleteItems", slug });
       setApiError(userMessageFromError(err));
     }
   }
 
   return (
-    <div id={id} className="Card Cart">
+    <div slug={slug} className="Card Cart">
       <div className="CardImg">
-        <img src={`/img/${id}.png`} alt={title} />
+        <img src={image} alt={title} />
       </div>
 
       <div className="ProductInfo">

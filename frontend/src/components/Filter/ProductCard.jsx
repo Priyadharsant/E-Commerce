@@ -3,60 +3,59 @@ import { ENDPOINTS } from "../../config/api";
 import { fetchJson } from "../../utils/api";
 import { logError, userMessageFromError } from "../../utils/errorHandler";
 import useInView from "../../hooks/useInView";
-function ProductCard({ id, title, description, rating, price, off, category, PopUp }) {
-    let Img = `/img/${id}.png`;
+function ProductCard({ slug, title, description, rating, price, image, off, category, PopUp }) {
     const [ref, inView] = useInView({ once: true });
     const [apiError, setApiError] = React.useState("");
     function handleClick() {
-        console.log(id);
+        console.log(slug);
         (async function add() {
             setApiError("");
             try {
-                await fetchJson(ENDPOINTS.ADD_CART, { method: "POST", body: JSON.stringify({ id }) });
-                PopUp();
+                await fetchJson(ENDPOINTS.ADD_CART, { method: "POST", body: JSON.stringify({ slug }) });
+                if (typeof PopUp === 'function') PopUp();
             } catch (err) {
                 if (err.status === 401) {
-                    // fallback: save to local cart
-                    saveToLocalCart(id);
-                    PopUp();
+                    // fallback: save to local cart (silent, no error logging)
+                    saveToLocalCart(slug);
+                    if (typeof PopUp === 'function') PopUp();
                     return;
                 }
-                logError(err, { source: "Filter:ProductCard:add_cart", id });
-                setApiError(userMessageFromError(err));
+                // Only log non-auth errors
+                logError({ source: "ProductCard:add_cart", slug });
             }
         })();
     }
 
-    function saveToLocalCart(id) {
-        let cart = JSON.parse(localStorage.getItem("cart")) || [];
+    function saveToLocalCart(slug) {
+        let cart = JSON.parse(localStorage.getItem("Cart")) || [];
 
-        const existingProduct = cart.find(item => item.id === id);
+        const existingProduct = cart.find(item => item.slug === slug);
 
         if (existingProduct) {
             existingProduct.quantity += 1;
         } else {
             cart.push({
-                id,
+                slug,
                 title,
                 description,
                 rating,
                 price,
                 off,
                 category,
-                Img,
+                image,
                 quantity: 1
             });
         }
 
-        localStorage.setItem("cart", JSON.stringify(cart));
+        localStorage.setItem("Cart", JSON.stringify(cart));
 
         console.log("Updated Cart:", cart);
     }
 
     return (
-        <div ref={ref} id={id} category={category} className={`Card scroll-animate ${inView ? "in-view" : ""}`}>
+        <div ref={ref} slug={slug} category={category} className={`Card scroll-animate ${inView ? "in-view" : ""}`}>
             <div className="CardImg">
-                <img src={Img} alt={title} />
+                <img src={image} alt={title} />
             </div>
 
             <div className="ProductInfo">

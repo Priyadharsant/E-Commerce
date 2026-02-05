@@ -49,6 +49,7 @@ function Header() {
             try {
                 const data = await fetchJson(ENDPOINTS.IS_AUTH);
                 if (mounted) setLogined(data && data.authenticated === true);
+                console.log(data)
             } catch (err) {
                 // treat failures as not logged in
                 logError(err, { source: "Header:isAuth" });

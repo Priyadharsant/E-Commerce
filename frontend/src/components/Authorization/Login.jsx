@@ -10,19 +10,53 @@ function Login() {
     const [msg, setMsg] = useState("");
 
     const handleSubmit = async (e) => {
-        e.preventDefault();
-        setIncorrect(false);
-        setMsg("");
+    e.preventDefault();
+    setIncorrect(false);
+    setMsg("");
 
+    const ENDPOINTS = {
+    LOGIN: "http://localhost:5000/login"
+};
+
+
+    try {
+        const response = await fetch(ENDPOINTS.LOGIN, {
+            method: "POST",
+            credentials: "include",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ username, password })
+        });
+
+        // 👇 read as text FIRST
+        const text = await response.text();
+        console.log("dinesh",text);
+        
+
+        // try converting to JSON safely
+        let data;
         try {
-            await fetchJson(ENDPOINTS.LOGIN, { method: "POST", body: JSON.stringify({ username, password }) });
-            window.location.href = "/";
-        } catch (err) {
-            logError(err, { source: "Login:handleSubmit" });
-            setIncorrect(true);
-            setMsg(userMessageFromError(err) || "Invalid credentials");
+            data = JSON.parse(text);
+            console.log("priyan",data);
+            
+        } catch {
+            throw new Error("Server returned invalid response (not JSON)");
         }
-    };
+
+        if (!response.ok) {
+            throw new Error(data.msg || "Invalid credentials");
+        }
+
+        window.location.href = "/";
+
+    } catch (err) {
+        logError(err, { source: "Login:handleSubmit" });
+        setIncorrect(true);
+        setMsg(err.message || "Login failed");
+    }
+};
+
 
     return (
         <div className="Login">

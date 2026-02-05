@@ -7,6 +7,12 @@
     padding: 0;
 }
 
+.Loader {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
 .header {
     display: flex;
     justify-content: space-between;
@@ -158,14 +164,17 @@ header::before {
     position: absolute;
     top: 2.55rem;
     left: 0;
-    background: rgba(255, 255, 255, 0.8);
+    background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(20px);
     border-radius: 14px;
     padding: 1rem;
     border: 1px solid rgba(255, 255, 255, 0.3);
     box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
-    z-index: -1;
+    z-index: 1002;
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+    /* ensure it sits above other header elements and can apply backdrop-filter */
 }
 
 .filterOptions li {

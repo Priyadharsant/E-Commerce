@@ -6,6 +6,7 @@ import LoadingSpinner from "../LoadingSpinner";
 import Header from "../Header";
 import { useSearchParams } from "react-router-dom";
 import FilterSection from "./FilterSection";
+import Pop from "../Popup";
 
 function Filter() {
     const [searchParams] = useSearchParams();
@@ -17,7 +18,13 @@ function Filter() {
     const [categories, setCategories] = useState({});
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
-
+    const [success, SetSuccess] = useState(false);
+    function Popfunc() {
+        SetSuccess(true)
+        setTimeout(() => {
+            SetSuccess(false)
+        }, 5000)
+    }
     useEffect(() => {
         if (!filter) return;
 
@@ -88,9 +95,12 @@ function Filter() {
                         categoryName={categoryName}
                         products={categories[categoryName]}
                         filter={filter}
+                        PopUp={Popfunc}
+
                     />
                 ))}
             </main>
+            <Pop success={success} />
         </>
     );
 }

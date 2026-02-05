@@ -64,14 +64,8 @@ function Home() {
                     {error && <p className="error">{error}</p>}
                     {!loading && !error && products.map(product => (
                         <ProductCard
-                            key={product.id}
-                            id={product.id}
-                            title={product.title}
-                            description={product.description}
-                            rating={product.rating}
-                            price={product.price}
-                            off={product.off}
-                            category={product.category}
+                            key={product.slug}
+                            {...product}
                             PopUp={Popfunc}
                         />
                     ))}

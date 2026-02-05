@@ -6,6 +6,7 @@ import Header from "../Header";
 import CartCard from "./CartCard";
 import Pop from "../Popup";
 
+
 function Cart() {
     const [Carts, SetCarts] = useState([]);
     const [success, SetSuccess] = useState(false);
@@ -75,7 +76,7 @@ function Cart() {
                         <div className="CartsDetailCon">
                             {Carts.map(cart => (
                                 <CartCard
-                                    key={cart.productId || cart.id}
+                                    key={cart.slug}
                                     {...cart}
                                     UpdateQuantity={Update}
                                     PopUp={Popfunc}
@@ -122,7 +123,9 @@ function Cart() {
                     </p>
                 )}
             </div>
-
+            <button className="BuyBtn">
+                Print
+            </button>
             <Pop success={success} />
         </>
     );

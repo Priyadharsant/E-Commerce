@@ -3,61 +3,59 @@ import { ENDPOINTS } from "../../config/api";
 import { fetchJson } from "../../utils/api";
 import { logError, userMessageFromError } from "../../utils/errorHandler";
 import useInView from "../../hooks/useInView";
-function ProductCard({ key, id, title, description, rating, price, off, category, PopUp }) {
-    let Img = `/img/${id}.png`;
+function ProductCard({ slug, title, image, description, rating, price, off, category, PopUp }) {
     const [ref, inView] = useInView({ once: true });
     const [apiError, setApiError] = React.useState("");
     function handleClick() {
         (async function addToCart() {
             setApiError("");
             try {
-                await fetchJson(ENDPOINTS.ADD_CART, { method: "POST", body: JSON.stringify({ id }) });
+                await fetchJson(ENDPOINTS.ADD_CART, { method: "POST", body: JSON.stringify({ slug }) });
                 PopUp();
             } catch (err) {
                 // 401 -> save to local cart
                 if (err.status === 401) {
-                    saveToLocalCart(id);
+                    saveToLocalCart(slug);
                     PopUp();
                     return;
                 }
-                logError(err, { source: "Home:ProductCard:add_cart", id });
+                logError({ source: "Home:ProductCard:add_cart", slug });
                 setApiError(userMessageFromError(err));
             }
         })();
     }
-    function saveToLocalCart(id) {
+    function saveToLocalCart(slug) {
 
-        let cart = JSON.parse(localStorage.getItem("cart")) || [];
+        let cart = JSON.parse(localStorage.getItem("Cart")) || [];
 
-        const existingProduct = cart.find(item => item.id === id);
+        const existingProduct = cart.find(item => item.slug === slug);
 
         if (existingProduct) {
             existingProduct.quantity += 1;
         } else {
             cart.push({
-                id,
+                slug,
                 title,
                 description,
                 rating,
                 price,
                 off,
                 category,
-                Img,
+                image,
                 quantity: 1
             });
         }
 
 
-        localStorage.setItem("cart", JSON.stringify(cart));
+        localStorage.setItem("Cart", JSON.stringify(cart));
 
-        console.log("Updated Cart:", cart);
 
     }
 
     return (
-        <div ref={ref} key={key} id={id} category={category} className={`Card scroll-animate ${inView ? "in-view" : ""}`}>
+        <div ref={ref} slug={slug} category={category} className={`Card scroll-animate ${inView ? "in-view" : ""}`}>
             <div className="CardImg">
-                <img src={Img} alt={title} />
+                <img src={image} alt={title} />
             </div>
 
             <div className="ProductInfo">
