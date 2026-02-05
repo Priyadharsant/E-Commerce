@@ -16,6 +16,7 @@ export async function fetchJson(pathOrFullUrl, options = {}) {
     try {
         const res = await fetch(url, opts);
         const data = await parseJsonSafe(res);
+        console.log(pathOrFullUrl,res)
         if (!res.ok) {
             const err = new Error((data && (data.msg || data.message)) || `Request failed with status ${res.status}`);
             err.status = res.status;

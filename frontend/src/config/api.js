@@ -2,7 +2,7 @@ const API_BASE = (process.env.REACT_APP_API_URL || "").replace(/\/$/, "");
 
 const apiUrl = (path = "") => {
     if (!path) return API_BASE;
-    return `${API_BASE}${path.startsWith("/") ? path : `/${path}`}`;
+    return `${"http://localhost:5000"}${path.startsWith("/") ? path : `/${path}`}`;
 };
 
 const ENDPOINTS = {

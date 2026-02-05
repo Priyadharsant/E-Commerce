@@ -26,7 +26,7 @@ app.use((req, res, next) => {
 });
 
 app.use(cors({
-    origin: function (origin, callback) {
+    origin: true,/*function (origin, callback) {
         // allow requests with no origin (like mobile apps, curl, server-to-server)
         if (!origin) return callback(null, true);
         // allow explicit allowed origins
@@ -38,7 +38,7 @@ app.use(cors({
         try {
             const url = new URL(origin);
             const host = url.hostname;
-            if (host.endsWith(".netlify.app") || host.endsWith(".github.io")) {
+            if (host.startsWith("http:localhost") || host.endsWith(".netlify.app") || host.endsWith(".github.io")) {
                 return callback(null, true);
             }
         } catch (e) {
@@ -47,7 +47,7 @@ app.use(cors({
 
         console.warn(`CORS blocked origin: ${origin}`);
         return callback(new Error("CORS policy: This origin is not allowed."));
-    },
+    }*/
     credentials: true
 }));
 

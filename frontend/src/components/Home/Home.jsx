@@ -31,7 +31,9 @@ function Home() {
             setError("");
             try {
                 const data = await fetchJson(ENDPOINTS.GET_PRODUCTS);
-                if (!Array.isArray(data)) throw new Error("Invalid products data");
+                console.log(data)
+                
+                // if (!Array.isArray(data)) throw new Error("Invalid products data");
                 if (mounted) setProducts(shuf(data));
             } catch (err) {
                 logError(err, { source: "Home:get_products" });
