@@ -10,7 +10,7 @@ export default function FilterSection({ categoryName, products, filter, PopUp })
         <div ref={ref} className={`filterContainer scroll-animate ${inView ? "in-view" : ""}`}>
             <h2>{categoryName}</h2>
 
-            <div className={`filterProducts ${filter === "all" ? "Multi" : ""}`}>
+            <div className={`filterProducts ${filter === "all" ? "Multi" : "Single"}`}>
                 {products.map((product) => (
                     <ProductCard
                         key={product.slug}

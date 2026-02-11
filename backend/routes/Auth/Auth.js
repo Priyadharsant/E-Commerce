@@ -1,21 +1,17 @@
 import express from "express";
-import isAuth from "../../controller/Auth/Auth_controller.js";
-import { login, signup } from "../../controller/Auth/Auth_controller.js";
-import passport from "passport";
-import User from "../../models/User.js";
+import { isAuth, logout, login, signup } from "../../controller/Auth/Auth_controller.js";
+import authMiddleware from "../../middleware/authMiddleware.js";
 
-const route = express.Router()
+const route = express.Router();
 
-route.get("/isAuth", isAuth)
+// Protected endpoint - requires JWT auth
+route.get("/isAuth", authMiddleware, isAuth);
 
-route.post("/login", (login));
+// Login and signup
+route.post("/login", login);
+route.post("/signup", signup);
 
-route.post("/logout", (req, res) => {
-    req.logout(() => res.json({ msg: "Logged out Successfully" }));
-});
-
-route.post("/signup", (signup));
-
-
+// Logout clears the token
+route.post("/logout", logout);
 
 export default route;

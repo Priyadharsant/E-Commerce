@@ -4,6 +4,8 @@ import Cart from "./Cart/Cart";
 import Filter from "./Filter/Filter";
 import Login from "./Authorization/Login";
 import Register from "./Authorization/Register";
+import AddProduct from "./addProduct/AddProduct";
+import ApprovalPanel from "./ApprovalPanel/ApprovalPanel";
 
 function App() {
     return (
@@ -13,6 +15,8 @@ function App() {
             <Route path="/filter" element={<Filter />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+            <Route path="/add-product" element={<AddProduct />} />
+            <Route path="/approval-panel" element={<ApprovalPanel />} />
         </Routes>
     );
 }

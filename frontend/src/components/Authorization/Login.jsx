@@ -1,61 +1,59 @@
 import React, { useState } from "react";
-import { ENDPOINTS } from "../../config/api";
+import { useNavigate } from "react-router-dom";
+import { ENDPOINTS, apiUrl } from "../../config/api";
 import { fetchJson } from "../../utils/api";
 import { logError, userMessageFromError } from "../../utils/errorHandler";
+import { useAuth } from "./auth";
 
 function Login() {
+    const navigate = useNavigate();
+    const { setUser } = useAuth();
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [incorrect, setIncorrect] = useState(false);
     const [msg, setMsg] = useState("");
 
     const handleSubmit = async (e) => {
-    e.preventDefault();
-    setIncorrect(false);
-    setMsg("");
+        e.preventDefault();
+        setIncorrect(false);
+        setMsg("");
 
-    const ENDPOINTS = {
-    LOGIN: "http://localhost:5000/login"
-};
-
-
-    try {
-        const response = await fetch(ENDPOINTS.LOGIN, {
-            method: "POST",
-            credentials: "include",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({ username, password })
-        });
-
-        // 👇 read as text FIRST
-        const text = await response.text();
-        console.log("dinesh",text);
-        
-
-        // try converting to JSON safely
-        let data;
         try {
-            data = JSON.parse(text);
-            console.log("priyan",data);
-            
-        } catch {
-            throw new Error("Server returned invalid response (not JSON)");
+            const response = await fetch(apiUrl(ENDPOINTS.LOGIN), {
+                method: "POST",
+                credentials: "include",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ username, password })
+            });
+
+            const text = await response.text();
+
+            let data;
+            try {
+                data = JSON.parse(text);
+            } catch {
+                throw new Error("Server returned invalid response (not JSON)");
+            }
+
+            if (!response.ok) {
+                throw new Error(data.msg || "Invalid credentials");
+            }
+
+            // Update auth context with user data
+            if (data.user) {
+                setUser(data.user);
+            }
+
+            // Redirect to home
+            navigate("/");
+        } catch (err) {
+            logError(err, { source: "Login:handleSubmit" });
+            setIncorrect(true);
+            setMsg(err.message || "Login failed");
         }
-
-        if (!response.ok) {
-            throw new Error(data.msg || "Invalid credentials");
-        }
-
-        window.location.href = "/";
-
-    } catch (err) {
-        logError(err, { source: "Login:handleSubmit" });
-        setIncorrect(true);
-        setMsg(err.message || "Login failed");
-    }
-};
+    };
 
 
     return (

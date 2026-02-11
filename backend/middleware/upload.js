@@ -1,15 +1,33 @@
-import multer from "multer";
-import { CloudinaryStorage } from "multer-storage-cloudinary"; 
-import cloudinary from "./../config/cloudinary.js";
+import cloudinary from "../config/cloudinary.js";
 
-const storage = new CloudinaryStorage({
-    cloudinary,
-    params: {
-        folder: "E-Commerce/Img/",
-        allowed_formats: ["jpg", "png", "jpeg"]
+export const approveImage = async (req, res) => {
+
+    try {
+
+        const tempPublicId = req.body.image;
+
+        // Replace Temp → image
+        const newPublicId = tempPublicId.replace(
+            "E-Commerce/Temp/Img",
+            "E-Commerce/Img"
+        );
+
+        const result = await cloudinary.uploader.rename(
+            tempPublicId,
+            newPublicId
+        );
+
+        res.json({
+            msg: "Image approved and moved!",
+            url: result.secure_url
+        });
+
+    } catch (err) {
+
+        console.error(err);
+
+        res.status(500).json({
+            msg: "Failed to move image"
+        });
     }
-});
-
-const upload = multer({ storage });
-
-export default upload;
+};

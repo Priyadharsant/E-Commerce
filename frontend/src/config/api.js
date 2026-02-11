@@ -16,6 +16,10 @@ const ENDPOINTS = {
     GET_CART: "/get_cart",
     GET_PRODUCTS: "/get",
     FILTER: "/filter",
+    ADD_PRODUCT: "/add_product",
+    PENDING_PRODUCTS: "/addProduct/pending",
+    APPROVE_PRODUCT: "/addProduct/approve",
+    REJECT_PRODUCT: "/addProduct/reject",
 };
 
 export { API_BASE, apiUrl, ENDPOINTS };

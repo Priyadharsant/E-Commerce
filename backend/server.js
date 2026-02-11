@@ -4,6 +4,7 @@ import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 import cors from "cors";
 import session from "express-session";
+import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
 import passport from "./config/Passport.js"
 import User from "./models/User.js";
@@ -28,7 +29,8 @@ app.use(cors({
 // });
 // app.use(cors({
 //     origin: "http://localhost:3000",
-//     credentials: true
+//     credentials: tru
+// e
 // }));
 
 // app.use(cors({
@@ -75,6 +77,9 @@ const allowedOrigin = [
 // }));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+
+// parse cookies so jwt/auth middleware can read token from cookie
+app.use(cookieParser());
 
 const isProd = process.env.NODE_ENV === "production";
 if (isProd) app.set("trust proxy", 1);

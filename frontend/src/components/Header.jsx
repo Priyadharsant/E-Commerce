@@ -1,25 +1,25 @@
 import React, { useEffect, useState, useRef } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { ENDPOINTS } from "../config/api";
+import { ENDPOINTS, apiUrl } from "../config/api";
 import { fetchJson } from "../utils/api";
 import { userMessageFromError, logError } from "../utils/errorHandler";
 import useInView from "../hooks/useInView";
 import LoadingSpinner from "./LoadingSpinner";
+import { useAuth } from "./Authorization/auth";
 
 function Header() {
     const navigate = useNavigate();
     const location = useLocation();
+    const { user, setUser } = useAuth();
     const [headerRef, headerInView] = useInView({ once: true, threshold: 0.05 });
     const [Categories, setCategories] = useState([]);
     const [open, setOpen] = useState(false)
     const [menuOpen, setMenuOpen] = useState(false);
-    const [logined, setLogined] = useState(false);
     const [categoriesLoading, setCategoriesLoading] = useState(false);
     const [categoriesError, setCategoriesError] = useState("");
     const navRef = useRef(null);
     const menuBtnRef = useRef(null);
     const filterRef = useRef(null);
-
     function Filter(category) {
         navigate(`/filter?filter=${encodeURIComponent(category)}`);
         setMenuOpen(false);
@@ -48,16 +48,17 @@ function Header() {
         (async function checkAuth() {
             try {
                 const data = await fetchJson(ENDPOINTS.IS_AUTH);
-                if (mounted) setLogined(data && data.authenticated === true);
-                console.log(data)
+                if (mounted && data?.user) {
+                    setUser(data.user);
+                }
             } catch (err) {
                 // treat failures as not logged in
                 logError(err, { source: "Header:isAuth" });
-                if (mounted) setLogined(false);
+                if (mounted) setUser(null);
             }
         })();
         return () => { mounted = false; };
-    }, [location.pathname]);
+    }, [location.pathname, setUser]);
     useEffect(() => {
         function handleClickOutside(e) {
             // close hamburger menu
@@ -124,11 +125,11 @@ function Header() {
     const handleLogout = async () => {
         try {
             await fetchJson(ENDPOINTS.LOGOUT, { method: "POST" });
+            setUser(null);
         } catch (err) {
             logError(err, { source: "Header:logout" });
         } finally {
-            setLogined(false);
-            navigate("/");
+            window.location.reload();
         }
     };
     return (
@@ -168,7 +169,25 @@ function Header() {
                             </div>
                         </Link>
 
-                        {logined ? (
+                        {(
+                            <Link to="/add-product" className={location.pathname === "/add-product" ? "show" : ""} onClick={() => setMenuOpen(false)}>
+                                <div>
+                                    <span className="material-symbols-outlined">add_circle</span>
+                                    <p>Add Product</p>
+                                </div>
+                            </Link>
+                        )}
+
+                        {user && user?.role === 'admin' && (
+                            <Link to="/approval-panel" className={location.pathname === "/approval-panel" ? "show" : ""} onClick={() => setMenuOpen(false)}>
+                                <div>
+                                    <span className="material-symbols-outlined">verified_user</span>
+                                    <p>Approvals</p>
+                                </div>
+                            </Link>
+                        )}
+
+                        {user ? (
 
                             <Link to="/"
                                 onClick={() => { handleLogout(); setMenuOpen(false); }} className={location.pathname === "/login" ? "show" : ""}>

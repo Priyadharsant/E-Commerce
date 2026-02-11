@@ -1,22 +1,22 @@
 import "dotenv/config";
 import mongoose from "mongoose";
 
-import  NewProduct from "./models/newproduct.js";   // old schema
-import OldProduct from "./models/Products.js";      // new schema
+import Products from "./models/Products.js";   // old schema
+import oldProducts from "./models/oldProducts.js";
 
 await mongoose.connect(process.env.MONGO_URI);
 
 async function migrate() {
 
-    const oldProducts = await OldProduct.find();
+    const oldProduct = await oldProducts.find();
 
-    console.log("Total products:", oldProducts.length);
+    console.log("Total products:", oldProduct.length);
 
-    for (const p of oldProducts) {
+    for (const p of oldProduct) {
 
         try {
 
-            await NewProduct.create({
+            const data = await Products.create({
 
                 title: p.title,
                 category: p.category,
@@ -27,6 +27,7 @@ async function migrate() {
                 off: p.off
 
             });
+            console.log(data);
 
             console.log("✅ Migrated:", p.title);
 

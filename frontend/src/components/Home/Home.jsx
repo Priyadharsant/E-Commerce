@@ -23,7 +23,7 @@ function Home() {
     const [success, SetSuccess] = useState(false);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
-
+    const [Popdata, setPopdata] = useState({})
     useEffect(() => {
         let mounted = true;
         (async function load() {
@@ -42,8 +42,9 @@ function Home() {
         })();
         return () => { mounted = false; };
     }, []);
-    function Popfunc() {
+    function Popfunc(data) {
         SetSuccess(true)
+        setPopdata(data)
         setTimeout(() => {
             SetSuccess(false)
         }, 5000)
@@ -71,7 +72,7 @@ function Home() {
                     ))}
                 </div>
             </main>
-            <Pop success={success} />
+            <Pop success={success} Popdata={Popdata} />
         </>
     );
 }

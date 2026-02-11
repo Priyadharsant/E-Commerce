@@ -19,8 +19,11 @@ function Filter() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
     const [success, SetSuccess] = useState(false);
-    function Popfunc() {
+    const [Popdata, setPopdata] = useState({})
+
+    function Popfunc(data) {
         SetSuccess(true)
+        setPopdata(data)
         setTimeout(() => {
             SetSuccess(false)
         }, 5000)
@@ -100,7 +103,7 @@ function Filter() {
                     />
                 ))}
             </main>
-            <Pop success={success} />
+            <Pop success={success} Popdata={Popdata} />
         </>
     );
 }

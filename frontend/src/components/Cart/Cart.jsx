@@ -5,65 +5,103 @@ import { logError } from "../../utils/errorHandler";
 import Header from "../Header";
 import CartCard from "./CartCard";
 import Pop from "../Popup";
-
+import { useAuth } from "../Authorization/auth.js";
 
 function Cart() {
-    const [Carts, SetCarts] = useState([]);
-    const [success, SetSuccess] = useState(false);
-    const [Amount_detail, SetAmountDetails] = useState({
-        Items: 0,
-        Price: 0,
-        TotalPrice: 0
+
+    const { user, loading } = useAuth();
+
+    const [carts, setCarts] = useState([]);
+    const [success, setSuccess] = useState(false);
+    const [Popdata, setPopdata] = useState({})
+
+    const [amountDetail, setAmountDetail] = useState({
+        items: 0,
+        price: 0,
+        totalPrice: 0
     });
 
+    // ✅ Local cart
     const getLocalCart = useCallback(() => {
         const cart = JSON.parse(localStorage.getItem("cart")) || {};
         return Object.values(cart);
     }, []);
 
+    // ✅ Calculate price
     const calculateAmounts = useCallback((data) => {
-        const Price = data.reduce(
+
+        const price = data.reduce(
             (sum, product) => sum + Number(product.price) * product.quantity,
             0
         );
 
-        SetAmountDetails({
-            Items: data.length,
-            Price,
-            TotalPrice: Math.round(Price * 0.8 * 100) / 100
+        const totalItems = data.reduce(
+            (sum, item) => sum + item.quantity,
+            0
+        );
+
+        setAmountDetail({
+            items: totalItems,
+            price,
+            totalPrice: Math.round(price * 0.8 * 100) / 100
         });
+
     }, []);
 
-    const Update = useCallback(() => {
+    // ✅ Load cart
+    const updateCart = useCallback(() => {
+
         (async function loadCart() {
+
             try {
-                const data = await fetchJson(ENDPOINTS.GET_CART);
-                if (!Array.isArray(data)) {
-                    SetCarts([]);
-                    calculateAmounts([]);
-                    return;
+
+                // 🔥 Wait until auth finishes
+                if (loading) return;
+
+                let data;
+
+                if (user) {
+
+                    data = await fetchJson(ENDPOINTS.GET_CART);
+
+                } else {
+
+                    data = getLocalCart();
                 }
-                SetCarts(data);
+
+                if (!Array.isArray(data)) data = [];
+
+                setCarts(data);
                 calculateAmounts(data);
+
             } catch (err) {
-                // fallback to local cart on auth or network errors
-                logError(err, { source: "Cart:Update" });
+
+                logError(err, { source: "Cart:updateCart" });
+
                 const localCart = getLocalCart();
-                SetCarts(localCart);
+                setCarts(localCart);
                 calculateAmounts(localCart);
             }
+
         })();
-    }, [getLocalCart, calculateAmounts]);
+
+    }, [user, loading, getLocalCart, calculateAmounts]);
 
     useEffect(() => {
-        Update();
-    }, [Update]);
+        updateCart();
+    }, [updateCart]);
 
-    function Popfunc() {
-        SetSuccess(true);
+    function popFunc(data) {
+        setSuccess(true)
+        setPopdata(data)
         setTimeout(() => {
-            SetSuccess(false);
-        }, 3000);
+            setSuccess(false)
+        }, 5000)
+    }
+
+    // ✅ Prevent flicker
+    if (loading) {
+        return <p style={{ textAlign: "center" }}>Loading cart...</p>;
     }
 
     return (
@@ -71,62 +109,68 @@ function Cart() {
             <Header />
 
             <div className="CartsCon">
-                {Carts.length > 0 ? (
+
+                {carts.length > 0 ? (
+
                     <>
                         <div className="CartsDetailCon">
-                            {Carts.map(cart => (
+                            {carts.map(cart => (
                                 <CartCard
                                     key={cart.slug}
                                     {...cart}
-                                    UpdateQuantity={Update}
-                                    PopUp={Popfunc}
+                                    UpdateQuantity={updateCart}
+                                    PopUp={popFunc}
                                 />
                             ))}
                         </div>
 
                         <div className="CartsAmountCon">
+
                             <h2>Price Details</h2>
 
-                            <div className="NItemsCon">
+                            <div>
                                 <p>No of Items</p>
-                                <p>{Amount_detail.Items}</p>
+                                <p>{amountDetail.items}</p>
                             </div>
 
-                            <div className="TotalPriceCon">
+                            <div>
                                 <p>Price</p>
-                                <p>₹{Amount_detail.Price}</p>
+                                <p>₹{amountDetail.price}</p>
                             </div>
 
-                            <div className="DiscountsCon">
-                                <p>Discounts</p>
+                            <div>
+                                <p>Discount</p>
                                 <p>20%</p>
                             </div>
 
-                            <div className="FinalAmountCon">
+                            <div>
                                 <p>Total Amount</p>
-                                <p>₹{Amount_detail.TotalPrice}</p>
+                                <p>₹{amountDetail.totalPrice}</p>
                             </div>
 
-                            <div className="BuyCon">
-                                <div>
-                                    <span className="material-symbols-outlined">
-                                        shopping_bag
-                                    </span>
-                                    <button className="BuyBtn">Buy</button>
-                                </div>
-                            </div>
+                            <button className="BuyBtn">
+                                Buy
+                            </button>
+
                         </div>
                     </>
+
                 ) : (
+
                     <p style={{ padding: "1rem", textAlign: "center" }}>
                         Your cart is empty
                     </p>
                 )}
             </div>
-            <button className="BuyBtn">
+
+            <button
+                className="BuyBtn"
+                onClick={() => window.print()}
+            >
                 Print
             </button>
-            <Pop success={success} />
+
+            <Pop success={success} Popdata={Popdata} />
         </>
     );
 }

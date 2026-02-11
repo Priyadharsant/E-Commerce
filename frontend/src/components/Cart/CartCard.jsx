@@ -3,9 +3,10 @@ import { ENDPOINTS } from "../../config/api";
 import { fetchJson } from "../../utils/api";
 import { logError, userMessageFromError } from "../../utils/errorHandler";
 
+/* ---------- LOCAL STORAGE HELPERS ---------- */
 
 function getLocalCart() {
-  return JSON.parse(localStorage.getItem("cart")) || {};
+  return JSON.parse(localStorage.getItem("cart")) || [];
 }
 
 function setLocalCart(cart) {
@@ -26,20 +27,39 @@ function CartCard({
 }) {
   const [apiError, setApiError] = React.useState("");
 
-  /* ---------- LOCAL CART LOGIC ---------- */
+  /* ---------- ADD LOCAL ---------- */
+
   function addToLocalCart() {
 
-    let cart = getLocalCart() || [];
+    let cart = getLocalCart();
 
-    const item = cart.find(p => p.slug === slug);
-    if (item) item.quantity += 1;
+    const index = cart.findIndex(p => p.slug === slug);
 
-    setLocalCart(cart)
+    if (index !== -1) {
+
+      cart[index].quantity += 1;
+
+    } else {
+
+      cart.push({
+        slug,
+        title,
+        price,
+        image,
+        quantity: 1
+      });
+    }
+
+    setLocalCart(cart);
+    UpdateQuantity();
+    PopUp?.({ msg: "Add to Cart Successfully", status: true });
   }
 
-  function deleteFromLocalCart(productId) {
+  /* ---------- DELETE LOCAL ---------- */
 
-    let cart = JSON.parse(localStorage.getItem("Cart")) || [];
+  function deleteFromLocalCart() {
+
+    let cart = getLocalCart();
 
     cart = cart
       .map(item =>
@@ -48,47 +68,65 @@ function CartCard({
           : item
       )
       .filter(item => item.quantity > 0);
-    setLocalCart(cart)
+
+    setLocalCart(cart);
     UpdateQuantity();
   }
 
+  /* ---------- ADD ITEM ---------- */
+
   async function AddItems() {
+
     setApiError("");
+
     try {
-      await fetchJson(ENDPOINTS.ADD_CART, { method: "POST", body: JSON.stringify({ slug }) });
+
+      addToLocalCart()
       UpdateQuantity();
-      PopUp();
+      PopUp?.({ msg: "Add to Cart Successfully", status: true });
+
     } catch (err) {
-      if (err.status === 401) {
+
+      // 🔥 If not logged in → fallback local cart
+      if (err?.status === 401) {
         addToLocalCart();
-        UpdateQuantity();
-        PopUp();
         return;
       }
-      logError( { source: "CartCard:AddItems", slug });
+
+      logError(err, { source: "CartCard:AddItems", slug });
       setApiError(userMessageFromError(err));
     }
   }
 
   /* ---------- DELETE ITEM ---------- */
+
   async function DeleteItems() {
+
     setApiError("");
+
     try {
-      await fetchJson(ENDPOINTS.DELETE_CART, { method: "POST", body: JSON.stringify({ slug }) });
+
+      await fetchJson(ENDPOINTS.DELETE_CART, {
+        method: "POST",
+        body: JSON.stringify({ slug })
+      });
+
       UpdateQuantity();
+
     } catch (err) {
-      if (err.status === 401) {
-        deleteFromLocalCart(slug);
-        UpdateQuantity();
+
+      if (err?.status === 401) {
+        deleteFromLocalCart();
         return;
       }
+
       logError(err, { source: "CartCard:DeleteItems", slug });
       setApiError(userMessageFromError(err));
     }
   }
 
   return (
-    <div slug={slug} className="Card Cart">
+    <div className="Card Cart">
       <div className="CardImg">
         <img src={image} alt={title} />
       </div>
@@ -106,12 +144,17 @@ function CartCard({
         </div>
 
         <p className="Price">₹ {price}</p>
-        {apiError && <p className="error small" style={{ marginTop: 8 }}>{apiError}</p>}
+
+        {apiError && (
+          <p className="error small" style={{ marginTop: 8 }}>
+            {apiError}
+          </p>
+        )}
       </div>
 
       <div className="CartQuantity">
         <span
-          onClick={() => DeleteItems()}
+          onClick={DeleteItems}
           className="material-symbols-outlined"
         >
           remove
@@ -120,7 +163,7 @@ function CartCard({
         <p>{quantity}</p>
 
         <span
-          onClick={() => AddItems()}
+          onClick={AddItems}
           className="material-symbols-outlined"
         >
           add
