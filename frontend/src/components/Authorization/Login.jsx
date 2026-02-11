@@ -81,9 +81,9 @@ function Login() {
                     />
                 </div>
 
-                <p style={{ textAlign: "center" }}>
+                {/* <p style={{ textAlign: "center" }}>
                     <a href="/register">Don't have an account? Register here.</a>
-                </p>
+                </p> */}
 
                 {incorrect && (
                     <p style={{ color: "red", textAlign: "center" }}>{msg}</p>

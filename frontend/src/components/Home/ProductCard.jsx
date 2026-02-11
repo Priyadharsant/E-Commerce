@@ -4,9 +4,9 @@ import useInView from "../../hooks/useInView";
 import ConfirmModal from "../ConfirmModal";
 import { apiUrl } from "../../config/api";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../Authorization/auth.js";
 
 /* ---------- LOCAL CART ---------- */
-
 function getLocalCart() {
     return JSON.parse(localStorage.getItem("cart")) || [];
 }
@@ -44,6 +44,7 @@ function ProductCard({
     category,
     PopUp
 }) {
+    const { user, setUser } = useAuth();
 
     const [showConfirm, setShowConfirm] = React.useState(false);
     const [apiError, setApiError] = React.useState("");
@@ -130,7 +131,7 @@ function ProductCard({
             ref={ref}
             className={`Card scroll-animate ${inView ? "in-view" : ""}`}
         >
-            <div
+            {user && user?.role === 'admin' && <div
                 className="deleteBtn"
                 onClick={() => setShowConfirm(true)}
             >
@@ -138,7 +139,7 @@ function ProductCard({
                     delete
                 </span>
             </div>
-
+            }
             <div className="CardImg">
                 <img src={image} alt={title} />
             </div>

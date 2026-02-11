@@ -14,7 +14,7 @@ function App() {
             <Route path="/cart" element={<Cart />} />
             <Route path="/filter" element={<Filter />} />
             <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
+            {/* <Route path="/register" element={<Register />} /> */}
             <Route path="/add-product" element={<AddProduct />} />
             <Route path="/approval-panel" element={<ApprovalPanel />} />
         </Routes>

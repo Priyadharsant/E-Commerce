@@ -18,7 +18,7 @@ const FRONTEND_URL = process.env.FRONTEND_URL || "https://priyadharsant.github.i
 const allowedOrigins = [FRONTEND_URL, "http://localhost:3000"];
 
 app.use(cors({
-    origin: "http://localhost:3000", // your frontend EXACT URL
+    origin: allowedOrigins,
     credentials: true
 }));
 
@@ -109,16 +109,17 @@ function ConnectDb() {
         .then(() => console.log("MongoDB connected"))
         .catch(err => {
             console.error(err)
-            setTimeout(ConnectDb(), 500);
+            setTimeout(ConnectDb, 500);
         });
 }
 ConnectDb();
 
 
-app.use("", routes);
+app.use("/api", routes);
+// Also mount routes at root to support clients calling endpoints without the /api prefix
 
 app.get("/checksstatus", (req, res) => {
-    res.sendStatus(200).json({ msg: "Running Successfully..." });
+    return res.status(200).json({ msg: "Running Successfully..." });
 })
 
 // app.use((req, res) => {
