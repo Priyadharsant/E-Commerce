@@ -117,10 +117,11 @@ ConnectDb();
 
 app.use("/api", routes);
 // Also mount routes at root to support clients calling endpoints without the /api prefix
+app.use("/", routes);
 
-app.get("/checksstatus", (req, res) => {
-    return res.status(200).json({ msg: "Running Successfully..." });
-})
+// app.get("/checksstatus", (req, res) => {
+//     return res.status(200).json({ msg: "Running Successfully..." });
+// })
 
 // app.use((req, res) => {
 //     res.status(404).json({ msg: "Api Not found" });
@@ -129,4 +130,11 @@ app.get("/checksstatus", (req, res) => {
 app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on ${PORT}`));
+const server = app.listen(PORT, () => console.log(`Server running on ${PORT}`));
+server.on('error', (err) => {
+    if (err.code === 'EADDRINUSE') {
+        console.error(`Port ${PORT} is already in use`);
+        process.exit(1);
+    }
+    throw err;
+});

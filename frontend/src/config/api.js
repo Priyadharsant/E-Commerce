@@ -1,8 +1,11 @@
-const API_BASE = (process.env.REACT_APP_API_URL || "").replace(/\/$/, "");
+const API_BASE = "/api"// (process.env.REACT_APP_API_URL || "").replace(/\/$/, "");
 
 const apiUrl = (path = "") => {
     if (!path) return API_BASE;
-    return `${API_BASE}${path.startsWith("/") ? path : `/${path}`}`;
+    const ap = `${API_BASE}${path.startsWith("/") ? path : `/${path}`}`;
+    console.log(ap);
+    return ap;
+
 };
 
 const ENDPOINTS = {
