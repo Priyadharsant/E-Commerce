@@ -1,10 +1,11 @@
 {
   "name": "backend",
   "version": "1.0.0",
+  "type": "module",
   "main": "server.js",
   "scripts": {
-    "start": "nodemon -r dotenv/config server.js",
-    "dev": "nodemon index.js"
+    "start": "node -r dotenv/config server.js",
+    "dev": "nodemon -r dotenv/config server.js"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",
@@ -25,5 +26,8 @@
     "passport-local": "^1.0.0",
     "pdfcrowd": "^6.5.4",
     "slugify": "^1.6.6"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
   }
 }
