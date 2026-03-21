@@ -1,8 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ENDPOINTS, apiUrl } from "../../config/api";
-import { fetchJson } from "../../utils/api";
-import { logError, userMessageFromError } from "../../utils/errorHandler";
+import { logError } from "../../utils/errorHandler";
 import { useAuth } from "./auth";
 
 function Login() {

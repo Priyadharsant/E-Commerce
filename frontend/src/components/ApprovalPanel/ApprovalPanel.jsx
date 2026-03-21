@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { apiUrl, ENDPOINTS } from "../../config/api";
+import { apiUrl } from "../../config/api";
 import { logError, userMessageFromError } from "../../utils/errorHandler";
 import Header from "../Header";
 import "./ApprovalPanel.css";
@@ -16,11 +16,7 @@ function ApprovalPanel() {
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [successMessage, setSuccessMessage] = useState("");
 
-    useEffect(() => {
-        fetchPendingProducts();
-    }, []);
-
-    const fetchPendingProducts = async () => {
+    const fetchPendingProducts = useCallback(async () => {
         try {
             setLoading(true);
             setError("");
@@ -62,7 +58,11 @@ function ApprovalPanel() {
         } finally {
             setLoading(false);
         }
-    };
+    }, [navigate]);
+
+    useEffect(() => {
+        fetchPendingProducts();
+    }, [fetchPendingProducts]);
 
     const handleApprove = async (productId) => {
         try {

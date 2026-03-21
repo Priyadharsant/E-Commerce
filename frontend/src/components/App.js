@@ -3,7 +3,6 @@ import Home from "./Home/Home";
 import Cart from "./Cart/Cart";
 import Filter from "./Filter/Filter";
 import Login from "./Authorization/Login";
-import Register from "./Authorization/Register";
 import AddProduct from "./addProduct/AddProduct";
 import ApprovalPanel from "./ApprovalPanel/ApprovalPanel";
 

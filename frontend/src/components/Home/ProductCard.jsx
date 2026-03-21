@@ -44,7 +44,7 @@ function ProductCard({
     category,
     PopUp
 }) {
-    const { user, setUser } = useAuth();
+    const { user } = useAuth();
 
     const [showConfirm, setShowConfirm] = React.useState(false);
     const [apiError, setApiError] = React.useState("");

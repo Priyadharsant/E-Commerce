@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { ENDPOINTS, apiUrl } from "../config/api";
+import { ENDPOINTS } from "../config/api";
 import { fetchJson } from "../utils/api";
 import { userMessageFromError, logError } from "../utils/errorHandler";
 import useInView from "../hooks/useInView";

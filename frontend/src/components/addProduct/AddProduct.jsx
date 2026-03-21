@@ -1,6 +1,6 @@
 import React, { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { ENDPOINTS, apiUrl } from "../../config/api";
+import {apiUrl } from "../../config/api";
 import { logError, userMessageFromError } from "../../utils/errorHandler";
 import Header from "../Header";
 import "./AddProduct.css";
