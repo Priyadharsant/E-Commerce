@@ -1,4 +1,4 @@
-const API_BASE =  (process.env.REACT_APP_API_URL || "").replace(/\/$/, "");
+const API_BASE =  ("https://e-commerce-voig.onrender.com/api"|| "").replace(/\/$/, "");
 
 const apiUrl = (path = "") => {
     if (!path) return API_BASE;
