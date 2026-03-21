@@ -15,7 +15,22 @@ dotenv.config();
 
 const app = express();
 const FRONTEND_URL = process.env.FRONTEND_URL || "https://priyadharsant.github.io/E-Commerce";
-const allowedOrigins = [FRONTEND_URL, "http://localhost:3000"];
+const configuredOrigins = (process.env.ALLOWED_ORIGINS || "")
+    .split(",")
+    .map(origin => origin.trim())
+    .filter(Boolean);
+const allowedOrigins = [...new Set([
+    FRONTEND_URL,
+    "http://localhost:3000",
+    "https://ecommerce.priyan.online",
+    ...configuredOrigins
+])];
+const allowedHostSuffixes = [
+    ".netlify.app",
+    ".github.io",
+    ".onrender.com",
+    ".priyan.online"
+];
 
 app.use(cors({
     origin: function (origin, callback) {
@@ -27,11 +42,7 @@ app.use(cors({
         try {
             const url = new URL(origin);
             const host = url.hostname;
-            if (
-                host.endsWith(".netlify.app") ||
-                host.endsWith(".github.io") ||
-                host.endsWith(".onrender.com")
-            ) {
+            if (allowedHostSuffixes.some(suffix => host.endsWith(suffix))) {
                 return callback(null, true);
             }
         } catch (e) {
@@ -70,8 +81,8 @@ app.use(session({
     saveUninitialized: false,
     cookie: {
         httpOnly: true,
-        secure: false, // Must be false for localhost (HTTP)
-        sameSite: "lax",
+        secure: isProd,
+        sameSite: isProd ? "none" : "lax",
         maxAge: 1000 * 60 * 60 * 24
     }
 }));
