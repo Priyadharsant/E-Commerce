@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { apiUrl, ENDPOINTS } from "../../config/api";
+import { apiUrl } from "../../config/api";
 import { logError, userMessageFromError } from "../../utils/errorHandler";
 import Header from "../Header";
 import "./ApprovalPanel.css";

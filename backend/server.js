@@ -18,7 +18,28 @@ const FRONTEND_URL = process.env.FRONTEND_URL || "https://priyadharsant.github.i
 const allowedOrigins = [FRONTEND_URL, "http://localhost:3000"];
 
 app.use(cors({
-    origin: allowedOrigins,
+    origin: function (origin, callback) {
+        if (!origin) return callback(null, true);
+        if (allowedOrigins.indexOf(origin) !== -1) {
+            return callback(null, true);
+        }
+
+        try {
+            const url = new URL(origin);
+            const host = url.hostname;
+            if (
+                host.endsWith(".netlify.app") ||
+                host.endsWith(".github.io") ||
+                host.endsWith(".onrender.com")
+            ) {
+                return callback(null, true);
+            }
+        } catch (e) {
+        }
+
+        console.warn(`CORS blocked origin: ${origin}`);
+        return callback(new Error("CORS policy: This origin is not allowed."));
+    },
     credentials: true
 }));
 
@@ -33,48 +54,6 @@ app.use(cors({
 // e
 // }));
 
-// app.use(cors({
-//     origin: function (origin, callback) {
-//         if (!origin) return callback(null, true);
-//         if (allowedOrigins.indexOf(origin) !== -1) {
-//             return callback(null, true);
-//         }
-
-//         try {
-//             const url = new URL(origin);
-//             const host = url.hostname;
-//             if (host.endsWith(".netlify.app") || host.endsWith(".github.io")) {
-//                 return callback(null, true);
-//             }
-//         } catch (e) {
-//         }
-
-//         console.warn(`CORS blocked origin: ${origin}`);
-//         return callback(new Error("CORS policy: This origin is not allowed."));
-//     },
-//     credentials: true
-// }));
-
-const allowedOrigin = [
-    "http://localhost:3000",
-    "http://10.174.249.55:3000"
-];
-
-// app.use(cors({
-//     origin: function (origin, callback) {
-
-//         // allow Postman / mobile apps
-//         if (!origin) return callback(null, true);
-
-//         if (allowedOrigin.includes(origin)) {
-//             return callback(null, true);
-//         }
-
-//         console.log("Blocked by CORS:", origin);
-//         return callback(new Error("Not allowed by CORS"));
-//     },
-//     credentials: true
-// }));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
@@ -119,9 +98,9 @@ app.use("/api", routes);
 // Also mount routes at root to support clients calling endpoints without the /api prefix
 app.use("/", routes);
 
-// app.get("/checksstatus", (req, res) => {
-//     return res.status(200).json({ msg: "Running Successfully..." });
-// })
+app.get("/checksstatus", (req, res) => {
+    return res.status(200).json({ msg: "Running Successfully..." });
+})
 
 // app.use((req, res) => {
 //     res.status(404).json({ msg: "Api Not found" });
